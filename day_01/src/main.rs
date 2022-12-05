@@ -4,28 +4,30 @@ use std::path::Path;
 
 fn main() {
     if let Ok(lines) = read_lines("./test.input") {
-        let mut prev_max = 0;
         let mut sum = 0;
+        let mut sums: Vec<i32> = Vec::new();
+
         for line in lines {
             if let Ok(str) = line {
                 if str.is_empty() {
-                    if sum > prev_max {
-                        prev_max = sum;
-                    }
+                    sums.push(sum);
                     sum = 0;
-                } else {
-                    match str.parse::<i32>() {
-                        Ok(num) => {
-                            sum = sum + num;
-                        },
-                        Err(_e) => {
-                            panic!("cannot convert to an integer");
-                        }
+                    continue;
+                }
+
+                match str.parse::<i32>() {
+                    Ok(num) => {
+                        sum = sum + num;
+                    },
+                    Err(_e) => {
+                        panic!("cannot convert to an integer");
                     }
                 }
             }
         }
-        println!("The most calories being carried is {}", prev_max);
+        sums.sort_by(|a, b| b.cmp(a));
+        let sum: i32 = sums.iter().take(3).sum();
+        println!("The top three most calories being carried are: {}", sum);
     }
 }
 
