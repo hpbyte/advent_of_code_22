@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{self, BufRead};
@@ -23,21 +21,16 @@ fn get_priority(c: &char) -> i32 {
     *c as i32 - 'A' as i32 + 27
 }
 
-fn get_common_item(str1: &str, str2: &str) -> Option<char> {
-    let (shorter, longer) = if str1.len() > str2.len() {
-        (str2, str1)
-    } else {
-        (str1, str2)
-    };
-    let set: HashSet<char> = shorter.chars().collect();
+fn get_common_item(batch: Vec<&String>) -> char {
+    let mut set: HashSet<char> = HashSet::new();
 
-    for c in longer.chars() {
-        if set.contains(&c) {
-            return Some(c);
-        }
-    }
+    batch.iter().for_each(|x| set.extend(x.chars()));
+    batch.iter().for_each(|x| set.retain(|y| x.contains(*y)));
 
-    None
+    // there must 1 match that is common
+    debug_assert!(set.len() == 1);
+
+    *set.iter().next().unwrap()
 }
 
 pub fn process_part_1(filename: &str) -> Option<i32> {
@@ -47,9 +40,8 @@ pub fn process_part_1(filename: &str) -> Option<i32> {
             .map(|l| {
                 if let Ok(line) = l {
                     let (first, second) = line.split_at(line.len() >> 1);
-                    if let Some(common_item) = get_common_item(first, second) {
-                        return get_priority(&common_item);
-                    }
+                    let common_item = get_common_item(vec![&first.to_string(), &second.to_string()]);
+                    return get_priority(&common_item);
                 }
 
                 0
@@ -63,8 +55,23 @@ pub fn process_part_1(filename: &str) -> Option<i32> {
 }
 
 pub fn process_part_2(filename: &str) -> Option<i32> {
+    const BATCH_SIZE: usize = 3;
+
     if let Ok(lines) = read_lines(filename) {
-        return Some(0);
+        let total_priority = lines
+            .filter(|l| l.is_ok() && !l.as_ref().unwrap().is_empty())
+            .collect::<Vec<_>>().chunks(BATCH_SIZE)
+            .map(|chunk| {
+                let batch = chunk
+                    .iter()
+                    .map(|line| line.as_ref().unwrap())
+                    .collect::<Vec<&String>>();
+                let common_item = get_common_item(batch);
+                return get_priority(&common_item);
+            })
+            .sum();
+
+        return Some(total_priority);
     }
 
     None

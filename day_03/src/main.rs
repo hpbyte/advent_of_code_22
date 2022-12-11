@@ -13,7 +13,7 @@ fn main() {
     }
 
     if let Some(ans) = process_part_2(filename) {
-        println!("Part 2 : The total score is: {}", ans);
+        println!("Part 2 : The total sum of priorities is: {}", ans);
     }
 }
 
@@ -30,6 +30,6 @@ mod tests {
     #[test]
     fn part_2_should_work() {
         let ans = process_part_2("./sample.input").unwrap();
-        assert_eq!(ans, 0);
+        assert_eq!(ans, 70);
     }
 }
