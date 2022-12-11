@@ -70,7 +70,9 @@ impl Outcome {
 
     fn get(moves: &(Move, Move)) -> Outcome {
         match moves {
-            (Move::Rock, Move::Paper) | (Move::Paper, Move::Scissor) | (Move::Scissor, Move::Rock) => Outcome::Win,
+            (Move::Rock, Move::Paper)
+            | (Move::Paper, Move::Scissor)
+            | (Move::Scissor, Move::Rock) => Outcome::Win,
             (opponent, player) if opponent == player => Outcome::Draw,
             _ => Outcome::Lose,
         }
@@ -96,16 +98,16 @@ fn get_desired_player_move(desired_outcome: &Outcome, opponent_move: &Move) -> M
 pub fn process_part_1(filename: &str) -> Option<i32> {
     if let Ok(lines) = read_lines(filename) {
         let total_score = lines
-            .filter(|l| l
-                .is_ok()
-                && !l.as_ref().unwrap().is_empty()
-            )
-            .map(|l| l
-                .unwrap()
-                .split_once(' ')
-                .map(|(opponent, player)| (Move::get(opponent), Move::get(player))).unwrap()
-            )
-            .fold(0, |acc, moves| acc + Move::get_score(&moves.1) + Outcome::get_score(&Outcome::get(&moves)));
+            .filter(|l| l.is_ok() && !l.as_ref().unwrap().is_empty())
+            .map(|l| {
+                l.unwrap()
+                    .split_once(' ')
+                    .map(|(opponent, player)| (Move::get(opponent), Move::get(player)))
+                    .unwrap()
+            })
+            .fold(0, |acc, moves| {
+                acc + Move::get_score(&moves.1) + Outcome::get_score(&Outcome::get(&moves))
+            });
 
         return Some(total_score);
     }
@@ -117,13 +119,20 @@ pub fn process_part_2(filename: &str) -> Option<i32> {
     if let Ok(lines) = read_lines(filename) {
         let total_score = lines
             .filter(|l| l.is_ok() && !l.as_ref().unwrap().is_empty())
-            .map(|l| l.unwrap().split_once(' ').map(|(opponent, desired_outcome)| {
-                let outcome = Outcome::get_desired_outcome(desired_outcome);
-                let player_move = get_desired_player_move(&outcome, &Move::get(opponent));
+            .map(|l| {
+                l.unwrap()
+                    .split_once(' ')
+                    .map(|(opponent, desired_outcome)| {
+                        let outcome = Outcome::get_desired_outcome(desired_outcome);
+                        let player_move = get_desired_player_move(&outcome, &Move::get(opponent));
 
-                (outcome, player_move)
-            }).unwrap())
-            .fold(0, |acc, (outcome, player)| acc + Move::get_score(&player) + Outcome::get_score(&outcome));
+                        (outcome, player_move)
+                    })
+                    .unwrap()
+            })
+            .fold(0, |acc, (outcome, player)| {
+                acc + Move::get_score(&player) + Outcome::get_score(&outcome)
+            });
 
         return Some(total_score);
     }
