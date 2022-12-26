@@ -20,12 +20,12 @@ mod tests {
     #[test]
     fn part_1_should_work() {
         let ans = process_part_1("./sample.input");
-        assert_eq!(ans, "");
+        assert_eq!(ans, "CMZ");
     }
 
     #[test]
     fn part_2_should_work() {
         let ans = process_part_2("./sample.input");
-        assert_eq!(ans, "");
+        assert_eq!(ans, "MCD");
     }
 }
