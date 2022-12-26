@@ -40,17 +40,25 @@ fn get_orders(order: &str) -> (usize, usize, usize) {
     (order[0], order[1], order[2])
 }
 
-fn process_orders(stacks: &mut Vec<Vec<char>>, orders: &str) {
+fn process_orders(stacks: &mut Vec<Vec<char>>, orders: &str, batched: bool) {
     orders
         .split("\n")
         .filter(|line| !line.is_empty())
         .map(|order| get_orders(order))
         .for_each(|(count, from, to)| {
+            let mut batch_crates: Vec<char> = vec![];
+
             for _ in 0..count {
                 if let Some(popped) = stacks[from - 1].pop() {
-                    stacks[to - 1].push(popped);
+                    if batched {
+                        batch_crates.insert(0, popped);
+                    } else {
+                        batch_crates.push(popped);
+                    }
                 }
             }
+
+            stacks[to - 1].append(&mut batch_crates);
         })
 }
 
@@ -59,7 +67,7 @@ pub fn process_part_1(filename: &str) -> String {
     let (crates, orders) = raw.split_once("\n\n").unwrap();
 
     let mut stacks = create_initial_stacks(crates);
-    process_orders(&mut stacks, orders);
+    process_orders(&mut stacks, orders, false);
 
     let final_top_crates = stacks.iter().fold("".to_string(), |mut accu, stack| {
         if let Some(top_crate) = stack.last() {
@@ -72,6 +80,20 @@ pub fn process_part_1(filename: &str) -> String {
     final_top_crates
 }
 
-pub fn process_part_2(filename: &str) -> &str {
-    ""
+pub fn process_part_2(filename: &str) -> String {
+    let raw = read_input_file(filename);
+    let (crates, orders) = raw.split_once("\n\n").unwrap();
+
+    let mut stacks = create_initial_stacks(crates);
+    process_orders(&mut stacks, orders, true);
+
+    let final_top_crates = stacks.iter().fold("".to_string(), |mut accu, stack| {
+        if let Some(top_crate) = stack.last() {
+            accu.push_str(top_crate.to_string().as_str());
+        }
+
+        accu
+    });
+
+    final_top_crates
 }
