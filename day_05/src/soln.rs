@@ -15,14 +15,13 @@ fn create_initial_stacks(inital_crates: &str) -> Vec<Vec<char>> {
     inital_crates
         .lines()
         .filter(|x| !x.starts_with(" 1"))
-        .map(|line| line.chars().collect::<Vec<char>>())
-        .for_each(|line_chars| {
-            for (index, c) in line_chars
-                .iter()
+        .for_each(|line| {
+            for (index, c) in line
+                .chars()
                 .enumerate()
                 .filter(|x| x.1.is_ascii_uppercase())
             {
-                stacks[(index as f32 / 4.).ceil() as usize - 1].insert(0, *c);
+                stacks[(index as f32 / 4.).ceil() as usize - 1].insert(0, c);
             }
         });
 
@@ -42,10 +41,10 @@ fn get_orders(order: &str) -> (usize, usize, usize) {
 
 fn process_orders(stacks: &mut Vec<Vec<char>>, orders: &str, batched: bool) {
     orders
-        .split("\n")
+        .lines()
         .filter(|line| !line.is_empty())
-        .map(|order| get_orders(order))
-        .for_each(|(count, from, to)| {
+        .for_each(|line| {
+            let (count, from, to) = get_orders(line);
             let mut batch_crates: Vec<char> = vec![];
 
             for _ in 0..count {
@@ -62,6 +61,16 @@ fn process_orders(stacks: &mut Vec<Vec<char>>, orders: &str, batched: bool) {
         })
 }
 
+fn get_final_top_crates(stacks: Vec<Vec<char>>) -> String {
+    stacks.iter().fold("".to_string(), |mut accu, stack| {
+        if let Some(top_crate) = stack.last() {
+            accu.push_str(top_crate.to_string().as_str());
+        }
+
+        accu
+    })
+}
+
 pub fn process_part_1(filename: &str) -> String {
     let raw = read_input_file(filename);
     let (crates, orders) = raw.split_once("\n\n").unwrap();
@@ -69,15 +78,7 @@ pub fn process_part_1(filename: &str) -> String {
     let mut stacks = create_initial_stacks(crates);
     process_orders(&mut stacks, orders, false);
 
-    let final_top_crates = stacks.iter().fold("".to_string(), |mut accu, stack| {
-        if let Some(top_crate) = stack.last() {
-            accu.push_str(top_crate.to_string().as_str());
-        }
-
-        accu
-    });
-
-    final_top_crates
+    get_final_top_crates(stacks)
 }
 
 pub fn process_part_2(filename: &str) -> String {
@@ -87,13 +88,5 @@ pub fn process_part_2(filename: &str) -> String {
     let mut stacks = create_initial_stacks(crates);
     process_orders(&mut stacks, orders, true);
 
-    let final_top_crates = stacks.iter().fold("".to_string(), |mut accu, stack| {
-        if let Some(top_crate) = stack.last() {
-            accu.push_str(top_crate.to_string().as_str());
-        }
-
-        accu
-    });
-
-    final_top_crates
+    get_final_top_crates(stacks)
 }
