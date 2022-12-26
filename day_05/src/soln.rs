@@ -9,17 +9,20 @@ fn read_input_file(filename: &str) -> String {
 }
 
 fn create_initial_stacks(inital_crates: &str) -> Vec<Vec<char>> {
-    let mut stacks: Vec<Vec<char>> = vec![vec![], vec![], vec![]];
+    let row_size = inital_crates.lines().count();
+    let mut stacks: Vec<Vec<char>> = vec![vec![]; row_size];
 
     inital_crates
-        .split("\n")
+        .lines()
+        .filter(|x| !x.starts_with(" 1"))
         .map(|line| line.chars().collect::<Vec<char>>())
         .for_each(|line_chars| {
-            for (index, c) in line_chars.iter().enumerate() {
-                if c.is_alphabetic() {
-                    let i = (index + 2) % 3;
-                    stacks[i].insert(0, *c);
-                }
+            for (index, c) in line_chars
+                .iter()
+                .enumerate()
+                .filter(|x| x.1.is_ascii_uppercase())
+            {
+                stacks[(index as f32 / 4.).ceil() as usize - 1].insert(0, *c);
             }
         });
 
@@ -44,8 +47,9 @@ fn process_orders(stacks: &mut Vec<Vec<char>>, orders: &str) {
         .map(|order| get_orders(order))
         .for_each(|(count, from, to)| {
             for _ in 0..count {
-                let popped = stacks[from - 1].pop().unwrap();
-                stacks[to - 1].push(popped);
+                if let Some(popped) = stacks[from - 1].pop() {
+                    stacks[to - 1].push(popped);
+                }
             }
         })
 }
@@ -57,14 +61,13 @@ pub fn process_part_1(filename: &str) -> String {
     let mut stacks = create_initial_stacks(crates);
     process_orders(&mut stacks, orders);
 
-    let final_top_crates = stacks
-        .iter()
-        .fold("".to_string(), |mut accu, stack| {
-            let top_crate = stack.last().unwrap().to_string();
-            accu.push_str(top_crate.as_str());
+    let final_top_crates = stacks.iter().fold("".to_string(), |mut accu, stack| {
+        if let Some(top_crate) = stack.last() {
+            accu.push_str(top_crate.to_string().as_str());
+        }
 
-            accu
-        });
+        accu
+    });
 
     final_top_crates
 }
