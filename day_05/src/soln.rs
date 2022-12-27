@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use std::fs;
 
 fn read_input_file(filename: &str) -> String {

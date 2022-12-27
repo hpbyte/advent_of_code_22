@@ -8,13 +8,15 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
 
-    if let Some(ans) = process_part_1(filename) {
-        println!("Part 1 : The total number of assignment pairs: {}", ans);
-    }
+    println!(
+        "Part 1: First marker after character: {:?}",
+        process_part_1(filename)
+    );
 
-    if let Some(ans) = process_part_2(filename) {
-        println!("Part 2 : The total number of assignment pairs: {}", ans);
-    }
+    println!(
+        "Part 2: First marker after character: {:?}",
+        process_part_2(filename)
+    );
 }
 
 #[cfg(test)]
@@ -23,13 +25,13 @@ mod tests {
 
     #[test]
     fn part_1_should_work() {
-        let ans = process_part_1("./sample.input").unwrap();
-        assert_eq!(ans, 2);
+        let ans = process_part_1("./sample.input");
+        assert_eq!(ans, "7561011");
     }
 
     #[test]
     fn part_2_should_work() {
-        let ans = process_part_2("./sample.input").unwrap();
-        assert_eq!(ans, 4);
+        let ans = process_part_2("./sample.input");
+        assert_eq!(ans, "");
     }
 }
