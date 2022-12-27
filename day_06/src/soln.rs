@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use std::collections::HashSet;
 use std::fs;
 
@@ -9,11 +7,20 @@ fn read_input_file(filename: &str) -> String {
         .replace('\r', "")
 }
 
-pub fn process_part_1(filename: &str) -> String {
-    let sequence_length = 4;
-    let raw = read_input_file(filename);
+fn combine(res: &Vec<usize>) -> String {
+    res.iter()
+        .fold("".to_owned(), |mut accu, curr| {
+            accu.push_str(curr.to_string().as_str());
+            accu.push(' ');
+            accu
+        })
+        .trim_end()
+        .to_string()
+}
 
-    raw.lines()
+fn tune(raw: String, sequence_length: usize) -> String {
+    let res = raw
+        .lines()
         .map(|line| {
             let mut n = 0;
             let chars = line.chars().collect::<Vec<char>>();
@@ -30,12 +37,21 @@ pub fn process_part_1(filename: &str) -> String {
 
             n + sequence_length
         })
-        .fold("".to_string(), |mut accu, curr| {
-            accu.push_str(curr.to_string().as_str());
-            accu
-        })
+        .collect();
+
+    combine(&res)
 }
 
-pub fn process_part_2(filename: &str) -> &str {
-    ""
+pub fn process_part_1(filename: &str) -> String {
+    let sequence_length = 4;
+    let raw = read_input_file(filename);
+
+    tune(raw, sequence_length)
+}
+
+pub fn process_part_2(filename: &str) -> String {
+    let sequence_length = 14;
+    let raw = read_input_file(filename);
+
+    tune(raw, sequence_length)
 }

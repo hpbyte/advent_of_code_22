@@ -26,12 +26,12 @@ mod tests {
     #[test]
     fn part_1_should_work() {
         let ans = process_part_1("./sample.input");
-        assert_eq!(ans, "7561011");
+        assert_eq!(ans, "7 5 6 10 11");
     }
 
     #[test]
     fn part_2_should_work() {
         let ans = process_part_2("./sample.input");
-        assert_eq!(ans, "");
+        assert_eq!(ans, "19 23 23 29 26");
     }
 }
